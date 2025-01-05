@@ -1,7 +1,8 @@
 const express = require("express");
 const { FriendModel } = require("../models/friend.model");
-const suggestionRouter = express.Router();
 const mongoose = require("mongoose");
+
+const suggestionRouter = express.Router();
 
 suggestionRouter.get('/', async (req, res) => {
     const currentUserId = req.user.UserID;
@@ -109,28 +110,44 @@ suggestionRouter.get('/', async (req, res) => {
                 },
             },
 
-            // Step 6: Format the result with restricted fields
+            // Step 6: Lookup details of the "whose friend" (the friend of the current user's friend)
             {
-                $project: {
-                    friendDetails: {
-                        $arrayElemAt: ['$friendDetails', 0],
-                    },
+                $lookup: {
+                    from: 'users',
+                    localField: 'friendId', // The current user's friend
+                    foreignField: '_id',
+                    as: 'whoseFriendDetails',
                 },
             },
+
+            // Step 7: Format the result with restricted fields
+            {
+                $project: {
+                    friendDetails: { $arrayElemAt: ['$friendDetails', 0] },
+                    whoseFriendDetails: { $arrayElemAt: ['$whoseFriendDetails', 0] },
+                },
+            },
+
+            // Step 8: Project only the relevant fields for both friendDetails and whoseFriendDetails
             {
                 $project: {
                     'friendDetails._id': 1,
                     'friendDetails.name': 1,
                     'friendDetails.email': 1,
                     'friendDetails.dp': 1,
+                    'whoseFriendDetails._id': 1,
+                    'whoseFriendDetails.name': 1,
+                    'whoseFriendDetails.email': 1,
+                    'whoseFriendDetails.dp': 1,
                 },
             },
 
-            // Step 7: Remove duplicates
+            // Step 9: Remove duplicates
             {
                 $group: {
                     _id: '$friendDetails._id',
                     friendDetails: { $first: '$friendDetails' },
+                    whoseFriendDetails: { $first: '$whoseFriendDetails' },
                 },
             },
         ]);

@@ -1,10 +1,12 @@
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
+const connectDB = require("../configs/db");
 require("dotenv").config();
 
 const authenticator = async (req, res, next) => {
   console.log("auth start", req.url, " line 6");
   try {
+    connectDB();
     const token = req.cookies.token || req.headers.authorization.split(" ")[1] || "";
     jwt.verify(token, process.env.SECRET_KEY, async (err, decoded) => {
       if (err) {
