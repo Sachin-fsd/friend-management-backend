@@ -10,6 +10,7 @@ const { authenticator } = require("./middleware/authenticator.middleware.js");
 const { feedRouter } = require("./routes/feed.router.js");
 const { requestRouter } = require("./routes/request.router.js");
 const { suggestionRouter } = require("./routes/suggestions.router.js");
+const { RegisterModel } = require("./models/register.model.js");
 
 require("dotenv").config();
 
