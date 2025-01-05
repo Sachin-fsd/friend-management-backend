@@ -15,7 +15,7 @@ const { RegisterModel } = require("./models/register.model.js");
 require("dotenv").config();
 
 const corsOptions = {
-  origin: 'https://friendz-zeta.vercel.app/', // replace with your React app origin
+  origin: 'https://friendz-zeta.vercel.app', // replace with your React app origin
   credentials: true,
 };
 app.use(cors(corsOptions));
