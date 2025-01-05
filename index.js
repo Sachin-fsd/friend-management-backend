@@ -11,6 +11,7 @@ const { feedRouter } = require("./routes/feed.router.js");
 const { requestRouter } = require("./routes/request.router.js");
 const { suggestionRouter } = require("./routes/suggestions.router.js");
 const { RegisterModel } = require("./models/register.model.js");
+const path = require('path');
 
 require("dotenv").config();
 
@@ -19,6 +20,11 @@ const corsOptions = {
   credentials: true,
 };
 app.use(cors(corsOptions));
+
+// Serve static files for production (React build)
+app.use(express.static(path.join(__dirname, 'client/build')));
+
+// This will handle all routes and redirect them to the React app
 
 
 app.use(cookieParser());
@@ -47,6 +53,10 @@ app.get("/api/users", async (req, res) => {
 
 app.use((req, res) => {
   res.status(404).send({ title: 'Not Found' });
+});
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
 });
 
 const PORT = process.env.PORT || 8080;
